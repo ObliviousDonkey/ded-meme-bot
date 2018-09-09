@@ -50,7 +50,7 @@ function scrapeSubreddit(subreddit, callback) {
   ) {
     var jsonResponse = JSON.parse(body);
     //Check if subreddit exists
-    if (jsonResponse.error != null) {
+    if (jsonResponse.error !== null) {
       msg.reply("Subreddit invalid");
       return;
     }
