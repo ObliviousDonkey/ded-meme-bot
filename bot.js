@@ -47,7 +47,7 @@ client.on("message", msg => {
 });
 
 function scrapeSubreddit(subreddit, callback) {
-    request("https://reddit.com/r/" + subreddit + "/hot/.json", function (
+    request("https://reddit.com/r/" + subreddit + "/hot/.json?limit=100", function (
         error,
         response,
         body
@@ -73,9 +73,20 @@ function scrapeSubreddit(subreddit, callback) {
                     description: entry.data.selftext,
                     redditUrl: entry.data.permalink,
                     upvotes: entry.data.score,
-                    timestamp: formattedTime,
-                    nsfw: entry.over_18
+                    timestamp: formattedTime
                 };
+
+                if (entry.data.over_18 == true) {
+                    continue;
+                }
+
+                if (entry.data.is_video == true) {
+                    continue;
+                }
+
+                if (entry.data.distinguished != null) {
+                    continue;
+                }
 
                 memes.push(tempMeme);
             });
@@ -84,4 +95,5 @@ function scrapeSubreddit(subreddit, callback) {
         callback(scrapedMemes);
     });
 }
-client.login(process.env.BOT_TOKEN);
+
+client.login("NDQ4NTcwNTc0NjcxODM5MjUy.DeYD8Q.SCFVZw42uiIc9oV6gSySQ4I3lGw");
