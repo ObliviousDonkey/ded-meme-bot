@@ -15,15 +15,16 @@ client.on("message", msg => {
         if (args[1] != null) {
             var memes = [];
             var subreddit = args[1];
+            checkIfSubExits(subreddit, function (exists) {
+                if (!exits) {
+                    msg.reply("subreddit invalid, please try again!");
+                }
+            });
             memes = scrapeSubreddit(subreddit, function (scrapedMemes) {
                 memes = scrapedMemes;
                 if (memes == null) {
                     msg.channel.send("Error");
                 } else {
-                    if (error != null || error != "") {
-                        msg.reply("Subreddit invalid!");
-                        error = null;
-                    }
                     var ranIndex = Math.floor(Math.random() * memes.length);
                     var meme = memes[ranIndex];
                     const embed = new Discord.RichEmbed()
@@ -47,44 +48,57 @@ client.on("message", msg => {
 });
 
 function scrapeSubreddit(subreddit, callback) {
+    checkIfSubExits(subreddit, function (exists) {
+        if (!exists) {
+
+        }
+    });
     request("https://reddit.com/r/" + subreddit + "/hot/.json", function (
         error,
         response,
         body
     ) {
         var jsonResponse = JSON.parse(body);
-        //Check if subreddit exists
-        if (jsonResponse.error == null) {
-            var memes = [];
-            jsonResponse.data.children.forEach(entry => {
-                var date = new Date(entry.data.created * 1000);
-                var formattedTime = date.toISOString();
-                var imgUrl = entry.data.url;
-                if (
-                    imgUrl.includes("png") == false &&
-                    imgUrl.includes("jpg") == false &&
-                    imgUrl.includes("gif") == false
-                ) {
-                    imgUrl = imgUrl + ".png";
-                }
-                var tempMeme = {
-                    title: entry.data.title,
-                    author: entry.data.author,
-                    imgUrl: imgUrl,
-                    redditUrl: entry.data.permalink,
-                    upvotes: entry.data.score,
-                    timestamp: formattedTime,
-                    nsfw: entry.over_18
-                };
+        var memes = [];
+        jsonResponse.data.children.forEach(entry => {
+            var date = new Date(entry.data.created * 1000);
+            var formattedTime = date.toISOString();
+            var imgUrl = entry.data.url;
+            if (
+                imgUrl.includes("png") == false &&
+                imgUrl.includes("jpg") == false &&
+                imgUrl.includes("gif") == false
+            ) {
+                imgUrl = imgUrl + ".png";
+            }
+            var tempMeme = {
+                title: entry.data.title,
+                author: entry.data.author,
+                imgUrl: imgUrl,
+                redditUrl: entry.data.permalink,
+                upvotes: entry.data.score,
+                timestamp: formattedTime,
+                nsfw: entry.over_18
+            };
 
-                memes.push(tempMeme);
-            });
-        } else {
-            error = "Subreddit invalid!";
-        }
-
+            memes.push(tempMeme);
+        });
         var scrapedMemes = memes;
         callback(scrapedMemes);
+    });
+}
+
+function checkIfSubExits(subreddit, callback) {
+    request("https://reddit.com/r/" + subreddit + "/.json", function (error, response, body) {
+        var json = JSON.parse(body);
+        var exists;
+        if (error != null) {
+            exists = false;
+
+        } else {
+            exists = true;
+        }
+        callback(exists);
     });
 }
 
