@@ -1,0 +1,17 @@
+{
+  "name": "ded-meme-bot",
+  "version": "1.0.0",
+  "description": "A really dnk meme bot",
+  "main": "bot.js",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
+    "discord.js": "^11.3.2",
+    "request": "^2.87.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Silent",
+  "license": "ISC"
+}
