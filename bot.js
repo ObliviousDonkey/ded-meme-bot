@@ -25,31 +25,18 @@ client.on("message", msg => {
                     } else {
                         var ranIndex = Math.floor(Math.random() * memes.length);
                         var meme = memes[ranIndex];
-                        if (meme.description != "") {
-                            const embed = new Discord.RichEmbed()
-                                .setTitle(meme.title)
-                                .setURL("https://reddit.com" + meme.redditUrl)
-                                .setAuthor(meme.author)
-                                .setDescription(meme.description)
-                                .setColor(0x00ae86)
-                                .setFooter("👍" + meme.upvotes)
-                                .setImage(meme.imgUrl)
-                                .setTimestamp(meme.timestamp);
-                        } else {
-                            const embed = new Discord.RichEmbed()
-                                .setTitle(meme.title)
-                                .setURL("https://reddit.com" + meme.redditUrl)
-                                .setAuthor(meme.author)
-                                .setColor(0x00ae86)
-                                .setFooter("👍" + meme.upvotes)
-                                .setImage(meme.imgUrl)
-                                .setTimestamp(meme.timestamp);
-                        }
-                        if (embed != null) {
-                            msg.channel.send({
-                                embed
-                            });
-                        }
+                        const embed = new Discord.RichEmbed()
+                            .setTitle(meme.title)
+                            .setURL("https://reddit.com" + meme.redditUrl)
+                            .setAuthor(meme.author)
+                            .setDescription(meme.description)
+                            .setColor(0x00ae86)
+                            .setFooter("👍" + meme.upvotes)
+                            .setImage(meme.imgUrl)
+
+                        msg.channel.send({
+                            embed
+                        });
                     }
                 }
             });
@@ -97,5 +84,4 @@ function scrapeSubreddit(subreddit, callback) {
         callback(scrapedMemes);
     });
 }
-
 client.login(process.env.BOT_TOKEN);
