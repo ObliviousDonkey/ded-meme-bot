@@ -15,7 +15,7 @@ client.on("message", msg => {
         if (args[1] != null) {
             var memes = [];
             var subreddit = args[1];
-            if (!checkIfSubExits(subreddit)) {
+            if (checkIfSubExits(subreddit)) {
                 msg.reply("subreddit invalid, please try again!");
             }
             memes = scrapeSubreddit(subreddit, function (scrapedMemes) {
