@@ -88,12 +88,13 @@ function checkIfSubExits(subreddit, callback) {
         console.log(error);
         console.log(json);
         if (json.error == null) {
+            console.log("subreddit not found")
             return true;
         } else {
+            console.log("subreddit found")
             return false;
         }
     });
-    return false;
 }
 
 client.login(process.env.BOT_TOKEN);
