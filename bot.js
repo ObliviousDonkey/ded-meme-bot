@@ -15,7 +15,7 @@ client.on("message", msg => {
         if (args[1] != null) {
             var memes = [];
             var subreddit = args[1];
-            if (!checkIfSubExits(subreddit)) {
+            if (isInvalidSub(subreddit)) {
                 msg.reply("subreddit invalid, please try again!");
                 return;
             }
@@ -82,19 +82,18 @@ function scrapeSubreddit(subreddit, callback) {
     });
 }
 
-function checkIfSubExits(subreddit, callback) {
+function isInvalidSub(subreddit, callback) {
     request("https://reddit.com/r/" + subreddit + ".json", function (error, response, body) {
         var json = JSON.parse(body);
         console.log(error);
-        console.log(json);
-        if (json.error == null) {
-            console.log("subreddit not found")
+        console.log(json.error);
+        if (json[error] !== null) {
+            console.log("invalid sub");
             return true;
-        } else {
-            console.log("subreddit found")
-            return false;
         }
     });
+    console.log("subreddit found 2")
+    return false;
 }
 
 client.login(process.env.BOT_TOKEN);
