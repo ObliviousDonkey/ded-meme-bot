@@ -50,34 +50,35 @@ function scrapeSubreddit(subreddit, callback) {
   ) {
     var jsonResponse = JSON.parse(body);
     //Check if subreddit exists
-    if (jsonResponse.error !== null) {
-      msg.reply("Subreddit invalid");
-      return;
-    }
-    var memes = [];
-    jsonResponse.data.children.forEach(entry => {
-      var date = new Date(entry.data.created * 1000);
-      var formattedTime = date.toISOString();
-      var imgUrl = entry.data.url;
-      if (
-        imgUrl.includes("png") == false &&
-        imgUrl.includes("jpg") == false &&
-        imgUrl.includes("gif") == false
-      ) {
-        imgUrl = imgUrl + ".png";
-      }
-      var tempMeme = {
-        title: entry.data.title,
-        author: entry.data.author,
-        imgUrl: imgUrl,
-        redditUrl: entry.data.permalink,
-        upvotes: entry.data.score,
-        timestamp: formattedTime,
-        nsfw: entry.over_18
-      };
+    if (jsonResponse.error == null) {
+      var memes = [];
+      jsonResponse.data.children.forEach(entry => {
+        var date = new Date(entry.data.created * 1000);
+        var formattedTime = date.toISOString();
+        var imgUrl = entry.data.url;
+        if (
+          imgUrl.includes("png") == false &&
+          imgUrl.includes("jpg") == false &&
+          imgUrl.includes("gif") == false
+        ) {
+          imgUrl = imgUrl + ".png";
+        }
+        var tempMeme = {
+          title: entry.data.title,
+          author: entry.data.author,
+          imgUrl: imgUrl,
+          redditUrl: entry.data.permalink,
+          upvotes: entry.data.score,
+          timestamp: formattedTime,
+          nsfw: entry.over_18
+        };
 
-      memes.push(tempMeme);
-    });
+        memes.push(tempMeme);
+      });
+    } else {
+      msg.reply("Subreddit invalid");
+    }
+
     var scrapedMemes = memes;
     callback(scrapedMemes);
   });
