@@ -89,18 +89,15 @@ function scrapeSubreddit(subreddit, callback) {
 }
 
 function checkIfSubExits(subreddit, callback) {
-    var exists;
+    var exists = false;
     request("https://reddit.com/r/" + subreddit + "/.json", function (error, response, body) {
         var json = JSON.parse(body);
-        if (json.error != null) {
-            exists = false;
-
-        } else {
+        if (json.error == null) {
             exists = true;
         }
-
+        callback(exists);
     });
-    callback(exists);
+
 }
 
 client.login(process.env.BOT_TOKEN);
