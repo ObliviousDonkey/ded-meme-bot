@@ -15,28 +15,30 @@ client.on("message", msg => {
         if (args[1] != null) {
             var memes = [];
             var subreddit = args[1];
-            if (isInvalidSub(subreddit)) {
-                msg.reply("subreddit invalid, please try again!");
-                return;
-            }
-            memes = scrapeSubreddit(subreddit, function (scrapedMemes) {
-                memes = scrapedMemes;
-                if (memes == null) {
-                    msg.channel.send("Error");
+            isInvalidSub(subreddit, function (invalid) {
+                if (invalid) {
+                    return;
                 } else {
-                    var ranIndex = Math.floor(Math.random() * memes.length);
-                    var meme = memes[ranIndex];
-                    const embed = new Discord.RichEmbed()
-                        .setTitle(meme.title)
-                        .setURL("https://reddit.com" + meme.redditUrl)
-                        .setAuthor(meme.author)
-                        .setColor(0x00ae86)
-                        .setFooter("👍" + meme.upvotes)
-                        .setImage(meme.imgUrl)
-                        .setTimestamp(meme.timestamp);
+                    memes = scrapeSubreddit(subreddit, function (scrapedMemes) {
+                        memes = scrapedMemes;
+                        if (memes == null) {
+                            msg.channel.send("Error");
+                        } else {
+                            var ranIndex = Math.floor(Math.random() * memes.length);
+                            var meme = memes[ranIndex];
+                            const embed = new Discord.RichEmbed()
+                                .setTitle(meme.title)
+                                .setURL("https://reddit.com" + meme.redditUrl)
+                                .setAuthor(meme.author)
+                                .setColor(0x00ae86)
+                                .setFooter("👍" + meme.upvotes)
+                                .setImage(meme.imgUrl)
+                                .setTimestamp(meme.timestamp);
 
-                    msg.channel.send({
-                        embed
+                            msg.channel.send({
+                                embed
+                            });
+                        }
                     });
                 }
             });
@@ -83,17 +85,17 @@ function scrapeSubreddit(subreddit, callback) {
 }
 
 function isInvalidSub(subreddit, callback) {
+    var invalid;
     request("https://reddit.com/r/" + subreddit + ".json", function (error, response, body) {
         var json = JSON.parse(body);
-        console.log(error);
-        console.log(json.error);
         if (json[error] !== null) {
             console.log("invalid sub");
-            return true;
+            invalid = true;
         }
     });
     console.log("subreddit found 2")
-    return false;
+    invalid = false;
+    callback(invalid);
 }
 
 client.login(process.env.BOT_TOKEN);
