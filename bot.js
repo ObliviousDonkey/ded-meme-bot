@@ -46,11 +46,6 @@ client.on("message", msg => {
 });
 
 function scrapeSubreddit(subreddit, callback) {
-    checkIfSubExits(subreddit, function (exists) {
-        if (!exists) {
-
-        }
-    });
     request("https://reddit.com/r/" + subreddit + "/hot/.json", function (
         error,
         response,
@@ -89,14 +84,14 @@ function scrapeSubreddit(subreddit, callback) {
 function checkIfSubExits(subreddit, callback) {
     request("https://reddit.com/r/" + subreddit + "/.json", function (error, response, body) {
         var json = JSON.parse(body);
+        console.log(error);
+        console.log(jsonResponse);
         if (json.error == null) {
             return true;
         } else {
             return false;
         }
-        return false;
     });
-
 }
 
 client.login(process.env.BOT_TOKEN);
