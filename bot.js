@@ -15,8 +15,9 @@ client.on("message", msg => {
         if (args[1] != null) {
             var memes = [];
             var subreddit = args[1];
-            if (checkIfSubExits(subreddit)) {
+            if (!checkIfSubExits(subreddit)) {
                 msg.reply("subreddit invalid, please try again!");
+                return;
             }
             memes = scrapeSubreddit(subreddit, function (scrapedMemes) {
                 memes = scrapedMemes;
@@ -82,7 +83,7 @@ function scrapeSubreddit(subreddit, callback) {
 }
 
 function checkIfSubExits(subreddit, callback) {
-    request("https://reddit.com/r/" + subreddit + "/.json", function (error, response, body) {
+    request("https://reddit.com/r/" + subreddit + ".json", function (error, response, body) {
         var json = JSON.parse(body);
         console.log(error);
         console.log(json);
@@ -92,6 +93,7 @@ function checkIfSubExits(subreddit, callback) {
             return false;
         }
     });
+    return false;
 }
 
 client.login(process.env.BOT_TOKEN);
