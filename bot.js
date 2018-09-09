@@ -56,6 +56,19 @@ function scrapeSubreddit(subreddit, callback) {
         var memes = [];
         if (jsonResponse['error'] == null) {
             jsonResponse.data.children.forEach(entry => {
+                //Nsfw
+                if (entry.data.over_18 == true) {
+                    return;
+                }
+                // Video
+                if (entry.data.is_video == true) {
+                    return;
+                }
+                //Mod Thread
+                if (entry.data.distinguished != null) {
+                    return;
+                }
+
                 var date = new Date(entry.data.created * 1000);
                 var formattedTime = date.toISOString();
                 var imgUrl = entry.data.url;
@@ -75,19 +88,6 @@ function scrapeSubreddit(subreddit, callback) {
                     upvotes: entry.data.score,
                     timestamp: formattedTime
                 };
-
-                if (entry.data.over_18 == true) {
-                    continue;
-                }
-
-                if (entry.data.is_video == true) {
-                    continue;
-                }
-
-                if (entry.data.distinguished != null) {
-                    continue;
-                }
-
                 memes.push(tempMeme);
             });
         }
@@ -96,4 +96,4 @@ function scrapeSubreddit(subreddit, callback) {
     });
 }
 
-client.login("NDQ4NTcwNTc0NjcxODM5MjUy.DeYD8Q.SCFVZw42uiIc9oV6gSySQ4I3lGw");
+client.login(process.env.BOT_TOKEN);
