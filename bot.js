@@ -16,7 +16,7 @@ client.on("message", msg => {
     if (args[1] != null) {
       var memes = [];
       var subreddit = args[1];
-      memes = scrapeSubreddit(subreddit, function(scrapedMemes) {
+      memes = scrapeSubreddit(subreddit, function (scrapedMemes) {
         memes = scrapedMemes;
         if (memes == null) {
           msg.channel.send("Error");
@@ -28,9 +28,9 @@ client.on("message", msg => {
             var meme = memes[ranIndex];
 
             //check description length
-            if (meme.description.length > 2000) {
+            if (meme.description != null && meme.description.length > 2000) {
               meme.description = meme.description.substring(0, 2000);
-              meme.description += " ... (for more click the link above).";
+              meme.description += " ... **(for more click the link above).**";
             }
             const embed = new Discord.RichEmbed()
               .setTitle(meme.title)
@@ -47,11 +47,11 @@ client.on("message", msg => {
             });
             console.log(
               "Message send: " +
-                meme.title +
-                " | " +
-                meme.imgUrl +
-                " | " +
-                meme.redditUrl
+              meme.title +
+              " | " +
+              meme.imgUrl +
+              " | " +
+              meme.redditUrl
             );
           }
         }
@@ -59,11 +59,59 @@ client.on("message", msg => {
     } else {
       msg.reply("Usage: !r <subreddit>");
     }
+  } else if (args[0] == "!mc") {
+    var server;
+    if (args[1] == null) {
+      msg.reply("!mc <minecraft-server>");
+      return;
+    }
+    server = args[1];
+    checkMCServerStatus(server, function (response) {
+      var color;
+      var text;
+      if (response == "offline") {
+        var color = 0xf20000;
+        var text = "Offline."
+
+      } else {
+        var color = 0x10ff00;
+        var text = response;
+      }
+
+      const embed = new Discord.RichEmbed()
+        .setTitle(server + " Server Status")
+        .setDescription(text)
+        .setColor(color)
+        .setTimestamp();
+
+      msg.channel.send({
+        embed
+      });
+    });
   }
 });
 
+function checkMCServerStatus(server, callback) {
+  request("https://api.mcsrvstat.us/1/" + server, function (
+    error,
+    response,
+    body
+  ) {
+    // console.log(body);
+
+    var jsonResponse = JSON.parse(body);
+    var status
+    if (jsonResponse['offline'] == null) {
+      callback("Online (" + jsonResponse.players['online'] + "/" + jsonResponse.players['max'] + ")");
+    } else {
+      callback("offline");
+    }
+
+  });
+}
+
 function scrapeSubreddit(subreddit, callback) {
-  request("https://reddit.com/r/" + subreddit + "/top/.json?limit=50", function(
+  request("https://reddit.com/r/" + subreddit + "/top/.json?limit=50", function (
     error,
     response,
     body
@@ -122,8 +170,4 @@ function scrapeSubreddit(subreddit, callback) {
     callback(scrapedMemes);
   });
 }
-
-
-
-
 client.login(process.env.BOT_TOKEN);
