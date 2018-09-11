@@ -37,6 +37,14 @@ client.on("message", msg => {
             msg.channel.send({
               embed
             });
+            console.log(
+              "Message send: " +
+                meme.title +
+                " | " +
+                meme.imgUrl +
+                " | " +
+                meme.redditUrl
+            );
           }
         }
       });
@@ -47,53 +55,65 @@ client.on("message", msg => {
 });
 
 function scrapeSubreddit(subreddit, callback) {
-  request(
-    "https://reddit.com/r/" + subreddit + "/hot/.json?limit=100",
-    function(error, response, body) {
-      var jsonResponse = JSON.parse(body);
-      var memes = [];
-      if (jsonResponse["error"] == null) {
-        jsonResponse.data.children.forEach(entry => {
-          //Nsfw
-          if (entry.data.over_18 == true) {
-            return;
-          }
-          // Video
-          if (entry.data.is_video == true) {
-            return;
-          }
-          //Mod Thread
-          if (entry.data.distinguished != null) {
-            return;
-          }
+  request("https://reddit.com/r/" + subreddit + "/top/.json?limit=50", function(
+    error,
+    response,
+    body
+  ) {
+    var jsonResponse = JSON.parse(body);
+    var memes = [];
+    if (jsonResponse["error"] == null) {
+      jsonResponse.data.children.forEach(entry => {
+        //Nsfw
+        if (entry.data.over_18 == true) {
+          return;
+        }
+        // Video
+        if (entry.data.is_video == true) {
+          return;
+        }
+        //Mod Thread
+        if (entry.data.distinguished != null) {
+          return;
+        }
 
-          var date = new Date(entry.data.created * 1000);
-          var formattedTime = date.toISOString();
-          var imgUrl = entry.data.url;
-          if (
-            imgUrl.includes("png") == false &&
-            imgUrl.includes("jpg") == false &&
-            imgUrl.includes("gif") == false &&
-            imgUrl.includes("gifv") == false
-          ) {
-            imgUrl = imgUrl + ".png";
-          }
-          var tempMeme = {
-            title: entry.data.title,
-            author: entry.data.author,
-            imgUrl: imgUrl,
-            description: entry.data.selftext,
-            redditUrl: entry.data.permalink,
-            upvotes: entry.data.score,
-            timestamp: formattedTime
-          };
-          memes.push(tempMeme);
-        });
-      }
-      var scrapedMemes = memes;
-      callback(scrapedMemes);
+        var date = new Date(entry.data.created * 1000);
+        var formattedTime = date.toISOString();
+        var imgUrl = entry.data.url;
+        if (
+          imgUrl.includes("png") == false &&
+          imgUrl.includes("jpg") == false &&
+          imgUrl.includes("gif") == false &&
+          imgUrl.includes("gifv") == false &&
+          imgUrl.includes("youtube.com") == false &&
+          imgUrl.includes("gfycat.com") == false
+        ) {
+          imgUrl = imgUrl + ".png";
+        }
+
+        if (imgUrl.includes(".gifv")) {
+          imgUrl = imgUrl.replace("gifv", "gif");
+        }
+
+        if (imgUrl.includes("gfycat.com")) {
+          imgUrl = imgUrl + ".gif";
+        }
+        var tempMeme = {
+          title: entry.data.title,
+          author: entry.data.author,
+          imgUrl: imgUrl,
+          description: entry.data.selftext,
+          redditUrl: entry.data.permalink,
+          upvotes: entry.data.score,
+          timestamp: formattedTime
+        };
+        memes.push(tempMeme);
+      });
     }
-  );
+    var scrapedMemes = memes;
+    callback(scrapedMemes);
+  });
 }
+
 
 client.login(process.env.BOT_TOKEN);
