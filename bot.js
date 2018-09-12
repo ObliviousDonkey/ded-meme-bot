@@ -103,8 +103,9 @@ function checkMCServerStatus(server, callback) {
     // console.log(body);
 
     var jsonResponse = JSON.parse(body);
+    console.log(jsonResponse);
     if( jsonResponse['status'] == 'success')
-    if (jsonResponse['online']) {
+    if (jsonResponse['online'] == true) {
       callback("Online (" + jsonResponse.players['now'] + "/" + jsonResponse.players['max'] + ")", jsonResponse['motd']);
     } else {
       callback("offline");
