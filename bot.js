@@ -66,21 +66,24 @@ client.on("message", msg => {
       return;
     }
     server = args[1];
-    checkMCServerStatus(server, function (response) {
+    checkMCServerStatus(server, function (response, motd) {
       var color;
       var text;
       if (response == "offline") {
         var color = 0xf20000;
-        var text = "Offline."
+        var text = "Offline.";
+        var description = "";
 
       } else {
         var color = 0x10ff00;
         var text = response;
+        var description = motd;
       }
 
       const embed = new Discord.RichEmbed()
-        .setTitle(server + " Server Status")
-        .setDescription(text)
+        .setAuthor(server + " Server Status")
+        .setTitle(text)
+        .setDescription(description)
         .setColor(color)
         .setTimestamp();
 
@@ -92,7 +95,7 @@ client.on("message", msg => {
 });
 
 function checkMCServerStatus(server, callback) {
-  request("https://api.mcsrvstat.us/1/" + server, function (
+  request("https://mcapi.us/server/status?ip=/" + server, function (
     error,
     response,
     body
@@ -101,8 +104,9 @@ function checkMCServerStatus(server, callback) {
 
     var jsonResponse = JSON.parse(body);
     var status
-    if (jsonResponse['offline'] == null) {
-      callback("Online (" + jsonResponse.players['online'] + "/" + jsonResponse.players['max'] + ")");
+    if( jsonResponse['status'] == 'success')
+    if (jsonResponse['online'] == true) {
+      callback("Online (" + jsonResponse.players['now'] + "/" + jsonResponse.players['max'] + ")", jsonResponse['motd']);
     } else {
       callback("offline");
     }
