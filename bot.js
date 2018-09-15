@@ -174,7 +174,7 @@ function checkMCServerStatus(server, callback) {
 
 function searchSubreddit(subreddit, query, callback) {
   request(
-    "https://reddit.com/r/" + subreddit + "/search.json?q=tyler1&restrict_sr=1",
+    "https://reddit.com/r/" + subreddit + "/search.json?q=tyler1&restrict_sr=1&limit=10",
     function(error, response, body) {
       var jsonResponse = JSON.parse(body);
       var memes = [];
