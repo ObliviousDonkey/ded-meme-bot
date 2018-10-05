@@ -181,9 +181,9 @@ function searchSubreddit(subreddit, query, callback) {
       if (jsonResponse["error"] == null) {
         jsonResponse.data.children.forEach(entry => {
           //Nsfw
-          if (entry.data.over_18 == true) {
-            return;
-          }
+          //if (entry.data.over_18 == true) {
+          //  return;
+          //}
           // Video
           if (entry.data.is_video == true) {
             return;
